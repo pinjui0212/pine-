@@ -1,0 +1,36 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ref5566391
+ // 此程式碼1次只會執行一筆交易 如果沒有出場不會再計算 
+ // 有3種交易方法要嘗試
+ //     1 只要出現信號就加入 如果盈虧比剛結束 且剛好在信號已經在過層中 則會馬上加入  2 只有信號剛出來那時才交易 (只進行一筆交易) 3  只有信號剛出來那時才交易 (每次出現都交易) 
+ //這coding 先做3 但是我不知道如何讓它執行多筆
+ //coding 2 可以寫 找出最後出線的super 就好
+//@version=5
+strategy("super*3", overlay=true, margin_long=100, margin_short=100,pyramiding = 10)
+
+
+[super1, direction1] = ta.supertrend(3,12)
+[super2, direction2] = ta.supertrend(1,10)
+[super3, direction3] = ta.supertrend(2,11)
+
+plot(direction1 < 0 ? super1 : na, "Up direction", color = color.green, style=plot.style_linebr)
+plot(direction1 > 0 ? super1 : na, "Down direction", color = color.red, style=plot.style_linebr)
+
+plot(direction2 < 0 ? super2 : na, "Up direction", color = color.green, style=plot.style_linebr)
+plot(direction2 > 0 ? super2 : na, "Down direction", color = color.red, style=plot.style_linebr)
+
+plot(direction3 < 0 ? super3 : na, "Up direction", color = color.green, style=plot.style_linebr)
+plot(direction3 > 0 ? super3 : na, "Down direction", color = color.red, style=plot.style_linebr)
+
+//做多條件 direction < 0 是綠色 是做多
+longCondition =  direction1 < 0 and direction2 < 0 and direction3 < 0
+if(longCondition)  
+    //strategy.entry("open long",strategy.long,comment = "3 個綠色 做多")
+    strategy.entry("open long",strategy.long,comment = "3 個綠色 做多")
+
+// 設定離場條件 1.達到止損(設在位置最低的super) 2.達到止盈(1:1.5(input))                        
+strategy.exit("close long","open long",limit = 1.1*strategy.position_avg_price,stop = 0.95*strategy.position_avg_price,comment = "10%止盈5%止損") 
+strategy.exit("close ","Buy Again",limit = 1.1*strategy.position_avg_price,stop = 0.95*strategy.position_avg_price,comment = "10%止盈5%止損") 
+//plot(strategy.position_size)
+//shortCondition = 
+
